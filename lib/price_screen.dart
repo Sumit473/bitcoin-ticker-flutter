@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'coin_data.dart';
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -6,6 +8,26 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  String selectedCurrency = currenciesList[0];
+
+  List<DropdownMenuItem> getDropdownItems() {
+    List< DropdownMenuItem<String>> dropdownItems = [];
+    for (String currency in currenciesList){
+      var newItem = DropdownMenuItem(
+        value: currency,
+        child: Text(
+            currency,
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+      );
+
+      dropdownItems.add(newItem);
+    }
+    return dropdownItems;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,12 +62,45 @@ class _PriceScreenState extends State<PriceScreen> {
           Container(
             height: 150.0,
             alignment: Alignment.center,
-            padding: EdgeInsets.only(bottom: 30.0),
+            padding: EdgeInsets.only(top: 30.0, bottom: 30.0),
             color: Colors.lightBlue,
-            child: null,
+            child: DropdownButton(
+              items: getDropdownItems(),
+              value: selectedCurrency,
+              onChanged: (value) {
+                setState(() {
+                  selectedCurrency = value;
+                });
+              },
+            ),
           ),
         ],
       ),
     );
   }
 }
+
+// CupertinoPicker(
+// backgroundColor: Colors.lightBlue,
+// itemExtent: 32.0,
+// onSelectedItemChanged: (selectedIndex) {
+// print(selectedIndex);
+// },
+// children: getPickerItems(),
+// ),
+
+// List<Text> getPickerItems() {
+//   List<Text> pickerItems = [];
+//
+//   for (String currency in currenciesList) {
+//     pickerItems.add(
+//       Text(
+//         currency,
+//         style: TextStyle(
+//           color: Colors.white,
+//         ),
+//       ),
+//     );
+//   }
+//   return pickerItems;
+// }
