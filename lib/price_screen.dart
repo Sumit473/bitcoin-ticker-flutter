@@ -28,6 +28,22 @@ class _PriceScreenState extends State<PriceScreen> {
     return dropdownItems;
   }
 
+  List<Text> getPickerItems() {
+    List<Text> pickerItems = [];
+
+    for (String currency in currenciesList) {
+      pickerItems.add(
+        Text(
+          currency,
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+      );
+    }
+    return pickerItems;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,14 +80,13 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(top: 30.0, bottom: 30.0),
             color: Colors.lightBlue,
-            child: DropdownButton(
-              items: getDropdownItems(),
-              value: selectedCurrency,
-              onChanged: (value) {
-                setState(() {
-                  selectedCurrency = value;
-                });
+            child: CupertinoPicker(
+              backgroundColor: Colors.lightBlue,
+              itemExtent: 32.0,
+              onSelectedItemChanged: (selectedIndex) {
+                print(selectedIndex);
               },
+              children: getPickerItems(),
             ),
           ),
         ],
@@ -80,27 +95,12 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 }
 
-// CupertinoPicker(
-// backgroundColor: Colors.lightBlue,
-// itemExtent: 32.0,
-// onSelectedItemChanged: (selectedIndex) {
-// print(selectedIndex);
+// DropdownButton(
+// items: getDropdownItems(),
+// value: selectedCurrency,
+// onChanged: (value) {
+// setState(() {
+// selectedCurrency = value;
+// });
 // },
-// children: getPickerItems(),
 // ),
-
-// List<Text> getPickerItems() {
-//   List<Text> pickerItems = [];
-//
-//   for (String currency in currenciesList) {
-//     pickerItems.add(
-//       Text(
-//         currency,
-//         style: TextStyle(
-//           color: Colors.white,
-//         ),
-//       ),
-//     );
-//   }
-//   return pickerItems;
-// }
