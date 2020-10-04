@@ -6,6 +6,7 @@ import 'dart:io' show Platform;
 import 'coin_data.dart';
 import 'coin_data.dart';
 import 'coin_data.dart';
+import 'coin_data.dart';
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -14,7 +15,8 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = currenciesList[0];
-  String bitcoinValue = '?';
+  Map<String, String> coinValues = {};
+  bool isWaiting = false;
 
   DropdownButton<String> androidDropdown() {
     List< DropdownMenuItem<String>> dropdownItems = [];
@@ -70,15 +72,35 @@ class _PriceScreenState extends State<PriceScreen> {
   }
 
   void getData() async{
+    isWaiting = true;
     try{
-      double data = await CoinData().getCoinData(selectedCurrency);
+      var data = await CoinData().getCoinData(selectedCurrency);
+      isWaiting = false;
       setState(() {
-        bitcoinValue = data.toStringAsFixed(0);
+        coinValues = data;
       });
     }
     catch(e){
       print(e);
     }
+  }
+
+  Column makeCards(){
+    List<CryptoCard> cryptoCards = [];
+    for (String crypto in cryptoList){
+      cryptoCards.add(
+        CryptoCard(
+          cryptoCurrency: crypto,
+          selectedCurrency: selectedCurrency,
+          value: isWaiting ? '?' : coinValues[crypto],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: cryptoCards,
+    );
   }
 
   @override
@@ -92,32 +114,13 @@ class _PriceScreenState extends State<PriceScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('🤑 Coin Ticker'),
+        centerTitle: true,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = $bitcoinValue $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
+          makeCards(),
           Container(
             height: 150.0,
             alignment: Alignment.center,
@@ -126,6 +129,43 @@ class _PriceScreenState extends State<PriceScreen> {
             child: Platform.isAndroid ? androidDropdown() : iOSPicker(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CryptoCard extends StatelessWidget {
+  final String cryptoCurrency;
+  final String selectedCurrency;
+  final String value;
+
+  CryptoCard({
+    this.cryptoCurrency,
+    this.selectedCurrency,
+    this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      child: Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          child: Text(
+            '1 $cryptoCurrency = $value $selectedCurrency',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }

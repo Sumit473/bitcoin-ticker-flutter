@@ -36,16 +36,22 @@ const coinAPIURL = 'https://rest.coinapi.io/v1/exchangerate';
 
 class CoinData {
   Future getCoinData(String selectedCurrency) async {
-    http.Response response = await http.get('$coinAPIURL/BTC/$selectedCurrency?apikey=$apiKey');
+    Map<String, String> cryptoPrices = {};
 
-    if (response.statusCode == 200) {
-      var decodedData = jsonDecode(response.body);
-      var lastPrice = decodedData['rate'];
-      return lastPrice;
+    for (String crypto in cryptoList){
+      http.Response response = await http.get('$coinAPIURL/$crypto/$selectedCurrency?apikey=$apiKey');
+
+      if (response.statusCode == 200) {
+        var decodedData = jsonDecode(response.body);
+        double lastPrice = decodedData['rate'];
+        cryptoPrices[crypto] = lastPrice.toStringAsFixed(0);
+      }
+      else {
+        print(response.statusCode);
+        throw 'Problem with the get request';
+      }
     }
-    else {
-      print(response.statusCode);
-      throw 'Problem with the get request';
-    }
+
+    return cryptoPrices;
   }
 }
